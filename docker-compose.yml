@@ -1,0 +1,45 @@
+version: '3'
+services:
+  mysql:
+    build:
+      context: .
+      dockerfile: ./mysql/Dockerfile
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pml
+      MYSQL_DATABASE: 40_project
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123    
+    ports:
+      - "53306:53306"
+    networks:
+      - db_nw
+  tomcat: 
+    build:
+      context: .
+      dockerfile: ./tomcat/Dockerfile
+    restart: always
+    ports: 
+      - "8081:8080"
+    depends_on:
+      - mysql
+    networks:
+      - db_nw
+      - web_nw
+    restart: always
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    restart: always
+    ports:
+      - "8888:8888"
+    depends_on:
+      - tomcat
+    networks: 
+      - web_nw
+networks:
+  db_nw:
+    driver: bridge
+  web_nw:
+    driver: bridge
